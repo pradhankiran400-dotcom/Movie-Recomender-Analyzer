@@ -5,7 +5,13 @@ import requests
 import matplotlib.pyplot as plt
 import seaborn as sns
 import base64
+import os
 
+# Fix paths
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(current_dir)
+
+# Define function FIRST
 def set_background(image_file):
     with open(image_file, "rb") as f:
         img_data = base64.b64encode(f.read()).decode()
@@ -19,9 +25,11 @@ def set_background(image_file):
         </style>
     """, unsafe_allow_html=True)
 
-set_background("analysis.jpg")
+# Call AFTER defining
+set_background(os.path.join(root_dir, "analysis.jpg"))
 
-df = pd.DataFrame(pickle.load(open('df_m.pkl', 'rb')))
+# Fix pkl path
+df = pd.DataFrame(pickle.load(open(os.path.join(root_dir, 'df_m.pkl'), 'rb')))
 df = df.loc[:, ~df.columns.duplicated()]
 df = df.reset_index(drop=True)
 df['profit'] = df['revenue'] - df['budget']
@@ -54,18 +62,13 @@ def plot_budget_revenue(budget, revenue):
     return fig
 
 st.title("📊 Movie Analysis")
-
 selected = st.selectbox("Select a Movie", df["title"].values)
-
 if st.button("Analyse"):
     movie = df[df["title"] == selected].iloc[0]
     poster = fetch_poster(movie["movie_id"])
-
     col1, col2 = st.columns([1, 2])
-
     with col1:
         st.image(poster, width=250)
-
     with col2:
         st.title(movie["title"])
         st.write(f"⭐ Rating    : {movie['rating']} / 10")
@@ -75,25 +78,18 @@ if st.button("Analyse"):
         st.write(f"💵 Profit    : ${movie['profit']:,}")
         st.write(f"🎭 Genres    : {', '.join(movie['genres']) if isinstance(movie['genres'], list) else movie['genres']}")
         st.write(f"🎬 Actors    : {', '.join(movie['actors']) if isinstance(movie['actors'], list) else movie['actors']}")
-
     st.divider()
-
     st.subheader("📖 Overview")
     st.write(movie["overview"])
-
     st.divider()
-
     st.subheader("📊 Visual Analysis")
-
     g1, g2 = st.columns(2)
     with g1:
         st.pyplot(plot_rating(movie["rating"]))
     with g2:
         st.pyplot(plot_budget_revenue(movie["budget"], movie["revenue"]))
-
     profit = movie["profit"]
     rating = movie["rating"]
-
     if profit > 0 and rating >= 7:
         st.success(f"✅ {selected} — Hit Movie! Great Rating & Profitable!")
     elif profit > 0 and rating < 7:
