@@ -4,6 +4,13 @@ import pandas as pd
 import requests
 import base64
 
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(current_dir)
+image_path = os.path.join(root_dir, "image.jpg")
+
+set_background(image_path)
 def set_background(image_file):
     with open(image_file, "rb") as f:
         img_data = base64.b64encode(f.read()).decode()
