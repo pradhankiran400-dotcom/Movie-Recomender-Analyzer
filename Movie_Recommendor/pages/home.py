@@ -24,7 +24,7 @@ def set_background(image_file):
         </style>
     """, unsafe_allow_html=True)
 
-set_background("image.jpg")
+set_background("Movie_Recommendor/image.jpg")
 
 movies     = pd.DataFrame(pickle.load(open('movies.pkl', 'rb')))
 similarity = pickle.load(open('similarity.pkl', 'rb'))
