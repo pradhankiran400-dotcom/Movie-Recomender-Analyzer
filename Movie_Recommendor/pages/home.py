@@ -8,6 +8,14 @@ import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(current_dir)
 
+import gdown
+
+similarity_path = os.path.join(root_dir, 'similarity.pkl')
+if not os.path.exists(similarity_path):
+    gdown.download(
+        'https://drive.google.com/file/d/196lfVcfpm4e9XEuISwOV9XH_pzzobZon/view?usp=sharing',
+        similarity_path, quiet=False)
+
 def set_background(image_file):
     with open(image_file, "rb") as f:
         img_data = base64.b64encode(f.read()).decode()
