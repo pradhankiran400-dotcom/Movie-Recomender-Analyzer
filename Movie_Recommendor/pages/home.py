@@ -4,18 +4,13 @@ import pandas as pd
 import requests
 import base64
 import os
+import gdown
 
+# Fix paths
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(current_dir)
 
-import gdown
-
-similarity_path = os.path.join(root_dir, 'similarity.pkl')
-if not os.path.exists(similarity_path):
-    gdown.download(
-        'https://drive.google.com/file/d/196lfVcfpm4e9XEuISwOV9XH_pzzobZon/view?usp=sharing',
-        similarity_path, quiet=False)
-
+# Define background function FIRST
 def set_background(image_file):
     with open(image_file, "rb") as f:
         img_data = base64.b64encode(f.read()).decode()
@@ -29,11 +24,24 @@ def set_background(image_file):
         </style>
     """, unsafe_allow_html=True)
 
-image_path = os.path.join(root_dir, "image.jpg")
-set_background(image_path)
+# Set background
+set_background(os.path.join(root_dir, "image.jpg"))
 
+# Download similarity.pkl from Google Drive if missing or corrupted
+similarity_path = os.path.join(root_dir, 'similarity.pkl')
+if not os.path.exists(similarity_path) or os.path.getsize(similarity_path) < 1_000_000:
+    if os.path.exists(similarity_path):
+        os.remove(similarity_path)
+    gdown.download(
+        id='196lfVcfpm4e9XEuISwOV9XH_pzzobZon',
+        output=similarity_path,
+        quiet=False,
+        fuzzy=True
+    )
+
+# Load pkl files
 movies     = pd.DataFrame(pickle.load(open(os.path.join(root_dir, 'movies.pkl'), 'rb')))
-similarity = pickle.load(open(os.path.join(root_dir, 'similarity.pkl'), 'rb'))
+similarity = pickle.load(open(similarity_path, 'rb'))
 
 def fetch_poster(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key=b29bc66ed87b5d4259606b0810101c03"
