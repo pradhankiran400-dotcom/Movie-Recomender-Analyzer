@@ -3,14 +3,11 @@ import pickle
 import pandas as pd
 import requests
 import base64
-
 import os
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(current_dir)
-image_path = os.path.join(root_dir, "image.jpg")
 
-set_background(image_path)
 def set_background(image_file):
     with open(image_file, "rb") as f:
         img_data = base64.b64encode(f.read()).decode()
@@ -24,10 +21,11 @@ def set_background(image_file):
         </style>
     """, unsafe_allow_html=True)
 
-set_background("Movie_Recommendor/image.jpg")
+image_path = os.path.join(root_dir, "image.jpg")
+set_background(image_path)
 
-movies     = pd.DataFrame(pickle.load(open('movies.pkl', 'rb')))
-similarity = pickle.load(open('similarity.pkl', 'rb'))
+movies     = pd.DataFrame(pickle.load(open(os.path.join(root_dir, 'movies.pkl'), 'rb')))
+similarity = pickle.load(open(os.path.join(root_dir, 'similarity.pkl'), 'rb'))
 
 def fetch_poster(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key=b29bc66ed87b5d4259606b0810101c03"
@@ -47,13 +45,10 @@ def recommend(movie):
     return names, posters
 
 st.title("🎬 Movie Recommender")
-
 selected = st.selectbox("Pick a movie:", movies["title"].values)
-
 if st.button("Recommend"):
     with st.spinner("Finding movies…"):
         names, posters = recommend(selected)
-
     st.subheader("You might also like:")
     for col, name, poster in zip(st.columns(7), names, posters):
         with col:
