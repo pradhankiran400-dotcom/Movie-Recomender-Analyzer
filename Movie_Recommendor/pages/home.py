@@ -25,7 +25,8 @@ def set_background(image_file):
     """, unsafe_allow_html=True)
 
 # Set background
-set_background(os.path.join(root_dir, "image.jpg"))
+# set_background(os.path.join(root_dir, "image.jpg"))
+set_background("image.jpg")
 
 # Download similarity.pkl from Google Drive if missing or corrupted
 similarity_path = os.path.join(root_dir, 'similarity.pkl')
